@@ -81,7 +81,7 @@ export default function Navbar() {
           <div className="hidden sm:flex items-center gap-4 ml-2">
             {isAuthenticated ? (
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+                <DropdownMenuTrigger>
                   <Button variant="ghost" className="gap-2 px-2 h-10">
                     <Avatar className="h-7 w-7">
                       <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email}`} />

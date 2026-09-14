@@ -15,10 +15,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<UserRole>("RESEARCHER");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage(null);
 
     try {
       const response = await fetch("/api/auth/login", {
@@ -34,11 +36,11 @@ export default function LoginPage() {
       if (response.ok) {
         login(email, role);
       } else {
-        alert(data.error || "Login failed. Please check your credentials.");
+        setErrorMessage(data.error || "Login failed. Please check your credentials.");
       }
     } catch (error) {
       console.error("Login Error:", error);
-      alert("An error occurred during sign-in. Please try again.");
+      setErrorMessage("An error occurred during sign-in. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -103,6 +105,11 @@ export default function LoginPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
+            {errorMessage && (
+              <div className="text-sm font-medium text-destructive text-center bg-destructive/10 p-2 rounded-md w-full">
+                {errorMessage}
+              </div>
+            )}
             <Button type="submit" className="w-full h-11 font-semibold" disabled={isLoading}>
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Sign In to Platform

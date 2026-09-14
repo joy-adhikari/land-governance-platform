@@ -34,7 +34,7 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        login(email, role);
+        login(data.user);
       } else {
         setErrorMessage(data.error || "Login failed. Please check your credentials.");
       }

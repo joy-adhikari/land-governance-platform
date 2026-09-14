@@ -1,2 +1,5 @@
-node_modules\n.next\n.env\n.DS_Store\n.claude
 node_modules
+.next
+.env
+.DS_Store
+.claude

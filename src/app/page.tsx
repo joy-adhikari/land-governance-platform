@@ -1,6 +1,7 @@
 import Hero from "@/components/home/Hero";
 import Pillars from "@/components/home/Pillars";
 import Stats from "@/components/home/Stats";
+import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
   return (
@@ -23,12 +24,12 @@ export default function HomePage() {
               institution, join us in creating an evidence-backed land ecosystem.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <button className="px-8 py-3 bg-primary text-primary-foreground rounded-full font-semibold hover:opacity-90 transition-all">
+              <Button className="rounded-full px-8 py-6 h-auto text-md font-semibold">
                 Apply for Researcher Access
-              </button>
-              <button className="px-8 py-3 bg-background border border-border rounded-full font-semibold hover:bg-muted transition-all">
+              </Button>
+              <Button variant="outline" className="rounded-full px-8 py-6 h-auto text-md font-semibold">
                 View Public Dashboards
-              </button>
+              </Button>
             </div>
           </div>
         </div>

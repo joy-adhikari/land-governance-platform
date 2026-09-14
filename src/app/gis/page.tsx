@@ -8,7 +8,9 @@ import {
   Filter,
   Maximize,
   Download,
-  AlertTriangle
+  AlertTriangle,
+  PanelLeftClose,
+  PanelLeftOpen
 } from "lucide-react";
 import {
   Card,
@@ -31,6 +33,7 @@ import {
   TabsList,
   TabsTrigger
 } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 
 // Dynamically import MapComponent to avoid SSR issues with Leaflet
 const MapComponent = dynamic(() => import("@/components/gis/MapComponent"), {
@@ -53,12 +56,33 @@ const LAYERS = [
 
 export default function GISPage() {
   const [activeLayer, setActiveLayer] = useState("landuse");
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+      });
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
 
   return (
-    <div className="flex h-[calc(100vh-64px)] overflow-hidden">
+    <div className={cn(
+      "flex overflow-hidden transition-all duration-300",
+      isFullscreen ? "fixed inset-0 z-[100] h-screen w-screen bg-background" : "h-[calc(100vh-64px)]"
+    )}>
       {/* Side Panel */}
-      <aside className="w-80 md:w-96 border-r bg-background flex flex-col">
-        <div className="p-6 border-b">
+      <aside className={cn(
+        "border-r bg-background flex flex-col transition-all duration-300",
+        isSidePanelOpen ? "w-80 md:w-96" : "w-0 opacity-0 overflow-hidden border-none",
+        !isFullscreen && "hidden md:flex"
+      )}>
+        <div className="p-6 border-b min-w-[320px]">
           <h1 className="text-2xl font-bold tracking-tight">GIS Dashboard</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Geospatial analysis of land governance and climate impact.
@@ -66,7 +90,7 @@ export default function GISPage() {
         </div>
 
         <ScrollArea className="flex-1 p-6">
-          <div className="space-y-8">
+          <div className="space-y-8 min-w-[250px]">
             <div>
               <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4 flex items-center gap-2">
                 <Layers className="h-4 w-4" /> Layer Control
@@ -148,11 +172,32 @@ export default function GISPage() {
       </aside>
 
       {/* Map Area */}
-      <main className="flex-1 relative">
-        <MapComponent activeLayer={activeLayer} />
+      <main className="flex-1 relative h-full w-full">
+        <MapComponent activeLayer={activeLayer} isSidePanelOpen={isSidePanelOpen} />
 
         {/* Map Overlays */}
+        <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            className="bg-background/80 backdrop-blur-md h-10 w-10"
+            onClick={() => setIsSidePanelOpen(!isSidePanelOpen)}
+            title="Toggle Side Panel"
+          >
+            {isSidePanelOpen ? <PanelLeftClose className="h-5 w-5" /> : <PanelLeftOpen className="h-5 w-5" />}
+          </Button>
+        </div>
+
         <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            className="bg-background/80 backdrop-blur-md h-10 w-10"
+            onClick={toggleFullscreen}
+            title="Toggle Fullscreen"
+          >
+            <Maximize className="h-5 w-5" />
+          </Button>
           <Badge className="bg-background/80 backdrop-blur-md text-foreground border-border px-3 py-1">
             Live Data: ISRO Bhuvan API
           </Badge>
@@ -163,8 +208,4 @@ export default function GISPage() {
       </main>
     </div>
   );
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(" ");
 }

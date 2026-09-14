@@ -3,6 +3,7 @@
 import React from "react";
 import { BookOpen, Search, Map, Zap, ShieldCheck, Users } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 const pillars = [
   {
@@ -94,6 +95,3 @@ export default function Pillars() {
   );
 }
 
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(" ");
-}

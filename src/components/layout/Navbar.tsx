@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -24,9 +24,17 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
+  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
@@ -42,7 +50,6 @@ const navItems = [
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
 
   return (
@@ -81,36 +88,38 @@ export default function Navbar() {
           <div className="hidden sm:flex items-center gap-4 ml-2">
             {isAuthenticated ? (
               <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Button variant="ghost" className="gap-2 px-2 h-10">
+                <DropdownMenuTrigger className={cn(buttonVariants({ variant: "ghost" }), "gap-2 px-2 h-10")}>
                     <Avatar className="h-7 w-7">
                       <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email}`} />
                       <AvatarFallback>{user?.full_name?.[0]}</AvatarFallback>
                     </Avatar>
                     <span className="text-sm font-medium">{user?.full_name}</span>
-                  </Button>
-                </DropdownMenuTrigger>
+                  </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user?.full_name}</p>
-                      <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
-                    </div>
-                  </DropdownMenuLabel>
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user?.full_name}</p>
+                        <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="gap-2 cursor-pointer">
+                      <User className="h-4 w-4" /> Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="gap-2 cursor-pointer">
+                      <Settings className="h-4 w-4" /> Account Settings
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="gap-2 cursor-pointer">
-                    <User className="h-4 w-4" /> Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="gap-2 cursor-pointer">
-                    <Settings className="h-4 w-4" /> Account Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="gap-2 text-destructive cursor-pointer focus:text-destructive"
-                    onClick={() => logout()}
-                  >
-                    <LogOut className="h-4 w-4" /> Log out
-                  </DropdownMenuItem>
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem
+                      className="gap-2 text-destructive cursor-pointer focus:text-destructive"
+                      onClick={() => logout()}
+                    >
+                      <LogOut className="h-4 w-4" /> Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
@@ -126,56 +135,57 @@ export default function Navbar() {
             )}
           </div>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
+          <Sheet>
+            <SheetTrigger className={cn(buttonVariants({ variant: "ghost" }), "md:hidden size-10 p-0")}>
+              <Menu className="h-5 w-5" />
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px] flex flex-col">
+              <SheetHeader className="mb-6">
+                <SheetTitle className="flex items-center gap-2 font-bold text-xl tracking-tight">
+                  <div className="bg-primary text-primary-foreground p-1 rounded">
+                    <Map className="h-5 w-5" />
+                  </div>
+                  LandGov <span className="text-primary">India</span>
+                </SheetTitle>
+              </SheetHeader>
+              <div className="flex flex-col gap-2">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-3 text-sm font-medium transition-colors rounded-md",
+                      pathname === item.href
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                    )}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+              <div className="mt-auto pt-6 flex flex-col gap-3 border-t">
+                {isAuthenticated ? (
+                  <Button variant="ghost" className="w-full justify-start gap-2" onClick={() => logout()}>
+                    <LogOut className="h-4 w-4" /> Log out
+                  </Button>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className={cn(buttonVariants({ variant: "outline" }), "w-full text-center")}
+                    >
+                      Sign In
+                    </Link>
+                    <Button className="w-full">Get Started</Button>
+                  </>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
-
-      {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden border-b bg-background p-4 space-y-2">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setIsOpen(false)}
-              className={cn(
-                "flex items-center gap-2 px-3 py-3 text-sm font-medium transition-colors rounded-md",
-                pathname === item.href
-                  ? "bg-accent text-accent-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent"
-              )}
-            >
-              <item.icon className="h-4 w-4" />
-              {item.name}
-            </Link>
-          ))}
-          <div className="pt-4 flex flex-col gap-2 border-t mt-4">
-            {isAuthenticated ? (
-              <Button variant="ghost" className="w-full justify-start gap-2" onClick={() => logout()}>
-                <LogOut className="h-4 w-4" /> Log out
-              </Button>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  onClick={() => setIsOpen(false)}
-                  className={cn(buttonVariants({ variant: "outline" }), "w-full text-center")}
-                >
-                  Sign In
-                </Link>
-                <Button className="w-full">Get Started</Button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
     </nav>
   );
 }

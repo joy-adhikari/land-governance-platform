@@ -64,20 +64,20 @@ export default function InnovationPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-primary text-primary-foreground">
+        <Card className="border-2 border-primary bg-background">
           <CardHeader>
-            <Trophy className="h-8 w-8 mb-2" />
-            <CardTitle>National Challenges</CardTitle>
-            <CardDescription className="text-primary-foreground/80">
+            <Trophy className="h-8 w-8 mb-2 text-primary" />
+            <CardTitle className="text-primary">National Challenges</CardTitle>
+            <CardDescription>
               Solve critical problems and win grants.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">12 Active</div>
-            <p className="text-sm opacity-80 mt-1">Challenges across 5 states</p>
+            <p className="text-sm text-muted-foreground mt-1">Challenges across 5 states</p>
           </CardContent>
           <CardFooter>
-            <Button variant="secondary" className="w-full gap-2">
+            <Button variant="default" className="w-full gap-2">
               Browse Challenges <ArrowRight className="h-4 w-4" />
             </Button>
           </CardFooter>

@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
-import { MapContainer, TileLayer, Marker, Popup, Polygon, Tooltip } from "react-leaflet";
+import React, { useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, Polygon, Tooltip, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L, { LatLngTuple } from "leaflet";
+
 
 // Fix for default marker icons in Leaflet
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -23,6 +24,15 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 interface MapComponentProps {
   activeLayer: string;
+  isSidePanelOpen?: boolean;
+}
+
+function MapResizer({ isSidePanelOpen }: { isSidePanelOpen?: boolean }) {
+  const map = useMap();
+  useEffect(() => {
+    map.invalidateSize();
+  }, [isSidePanelOpen, map]);
+  return null;
 }
 
 const MOCK_ZONES = [
@@ -31,17 +41,19 @@ const MOCK_ZONES = [
   { id: 3, name: "Conservation Zone C", color: "blue", coords: [[28.60, 77.23], [28.61, 77.23], [28.61, 77.24], [28.60, 77.24]] as LatLngTuple[], risk: "Medium" },
 ];
 
-export default function MapComponent({ activeLayer }: MapComponentProps) {
+export default function MapComponent({ activeLayer, isSidePanelOpen }: MapComponentProps) {
   return (
     <MapContainer
       center={[28.6139, 77.2090] as any}
       zoom={13}
       className="h-full w-full z-0"
     >
+      <MapResizer isSidePanelOpen={isSidePanelOpen} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+
 
       {activeLayer === "landuse" && MOCK_ZONES.map(zone => (
         <Polygon

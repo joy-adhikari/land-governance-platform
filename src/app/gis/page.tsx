@@ -34,6 +34,8 @@ import {
   TabsTrigger
 } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import { getStates, getStateData, LandZone } from "@/lib/gis-api";
 
 // Dynamically import MapComponent to avoid SSR issues with Leaflet
 const MapComponent = dynamic(() => import("@/components/gis/MapComponent"), {
@@ -55,9 +57,13 @@ const LAYERS = [
 ];
 
 export default function GISPage() {
+  const [selectedState, setSelectedState] = useState("Delhi");
   const [activeLayer, setActiveLayer] = useState("landuse");
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const stateData = getStateData(selectedState);
+  const currentZones = stateData?.zones || [];
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -72,140 +78,161 @@ export default function GISPage() {
   };
 
   return (
-    <div className={cn(
-      "flex overflow-hidden transition-all duration-300",
-      isFullscreen ? "fixed inset-0 z-[100] h-screen w-screen bg-background" : "h-[calc(100vh-64px)]"
-    )}>
-      {/* Side Panel */}
-      <aside className={cn(
-        "border-r bg-background flex flex-col transition-all duration-300",
-        isSidePanelOpen ? "w-80 md:w-96" : "w-0 opacity-0 overflow-hidden border-none",
-        !isFullscreen && "hidden md:flex"
+    <ProtectedRoute>
+      <div className={cn(
+        "flex overflow-hidden transition-all duration-300",
+        isFullscreen ? "fixed inset-0 z-[100] h-screen w-screen bg-background" : "h-[calc(100vh-64px)]"
       )}>
-        <div className="p-6 border-b min-w-[320px]">
-          <h1 className="text-2xl font-bold tracking-tight">GIS Dashboard</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Geospatial analysis of land governance and climate impact.
-          </p>
-        </div>
+        {/* Side Panel */}
+        <aside className={cn(
+          "border-r bg-background flex flex-col transition-all duration-300",
+          isSidePanelOpen ? "w-80 md:w-96" : "w-0 opacity-0 overflow-hidden border-none",
+          !isFullscreen && "hidden md:flex"
+        )}>
+          <div className="p-6 border-b min-w-[320px]">
+            <h1 className="text-2xl font-bold tracking-tight">GIS Dashboard</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Geospatial analysis of land governance across India.
+            </p>
 
-        <ScrollArea className="flex-1 p-6">
-          <div className="space-y-8 min-w-[250px]">
-            <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4 flex items-center gap-2">
-                <Layers className="h-4 w-4" /> Layer Control
-              </h3>
-              <div className="grid gap-2">
-                {LAYERS.map(layer => (
-                  <Button
-                    key={layer.id}
-                    variant={activeLayer === layer.id ? "default" : "outline"}
-                    className="justify-start gap-3 h-12"
-                    onClick={() => setActiveLayer(layer.id)}
-                  >
-                    <layer.icon className={cn("h-4 w-4", layer.color)} />
-                    {layer.name}
-                  </Button>
+            <div className="mt-4 space-y-2">
+              <label className="text-xs font-bold uppercase text-muted-foreground">Select State/UT</label>
+              <select
+                className="w-full p-2 rounded-md border bg-background text-sm focus:ring-2 focus:ring-primary outline-none"
+                value={selectedState}
+                onChange={(e) => setSelectedState(e.target.value)}
+              >
+                {getStates().map(state => (
+                  <option key={state} value={state}>{state}</option>
                 ))}
-              </div>
-            </div>
-
-            <Card>
-              <CardHeader className="p-4 pb-2">
-                <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                  <Info className="h-4 w-4" /> Layer Insights
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 pt-0 space-y-4">
-                {activeLayer === "landuse" && (
-                  <div className="space-y-3">
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      Visualizing agricultural vs urban land usage. Green zones indicate high agricultural productivity.
-                    </p>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="p-2 rounded bg-green-500/10 border border-green-500/20">
-                        <div className="text-[10px] text-green-600 font-bold">AGRI</div>
-                        <div className="text-xs font-semibold">62% Area</div>
-                      </div>
-                      <div className="p-2 rounded bg-orange-500/10 border border-orange-500/20">
-                        <div className="text-[10px] text-orange-600 font-bold">URBAN</div>
-                        <div className="text-xs font-semibold">28% Area</div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {activeLayer === "disputes" && (
-                  <div className="space-y-3">
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      Displaying areas with high litigation density. Red markers indicate unresolved ownership disputes.
-                    </p>
-                    <div className="p-3 rounded bg-red-500/10 border border-red-500/20">
-                      <div className="text-xs font-bold text-red-600 mb-1">High Risk Area</div>
-                      <div className="text-[10px] text-muted-foreground">Average resolution time: 4.2 years</div>
-                    </div>
-                  </div>
-                )}
-                {activeLayer === "climate" && (
-                  <div className="space-y-3">
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      Mapping flood vulnerability and soil erosion risks using satellite data.
-                    </p>
-                    <div className="p-3 rounded bg-blue-500/10 border border-blue-500/20">
-                      <div className="text-xs font-bold text-blue-600 mb-1">Vulnerability High</div>
-                      <div className="text-[10px] text-muted-foreground">Est. crop loss risk: 15% in 2026</div>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <div className="flex flex-col gap-2">
-              <Button variant="outline" className="w-full gap-2">
-                <Download className="h-4 w-4" /> Export Layer (GeoJSON)
-              </Button>
-              <Button variant="outline" className="w-full gap-2">
-                <Maximize className="h-4 w-4" /> Fullscreen Analysis
-              </Button>
+              </select>
             </div>
           </div>
-        </ScrollArea>
-      </aside>
 
-      {/* Map Area */}
-      <main className="flex-1 relative h-full w-full">
-        <MapComponent activeLayer={activeLayer} isSidePanelOpen={isSidePanelOpen} />
+          <ScrollArea className="flex-1 p-6">
+            <div className="space-y-8 min-w-[250px]">
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4 flex items-center gap-2">
+                  <Layers className="h-4 w-4" /> Layer Control
+                </h3>
+                <div className="grid gap-2">
+                  {LAYERS.map(layer => (
+                    <Button
+                      key={layer.id}
+                      variant={activeLayer === layer.id ? "default" : "outline"}
+                      className="justify-start gap-3 h-12"
+                      onClick={() => setActiveLayer(layer.id)}
+                    >
+                      <layer.icon className={cn("h-4 w-4", layer.color)} />
+                      {layer.name}
+                    </Button>
+                  ))}
+                </div>
+              </div>
 
-        {/* Map Overlays */}
-        <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            className="bg-background/80 backdrop-blur-md h-10 w-10"
-            onClick={() => setIsSidePanelOpen(!isSidePanelOpen)}
-            title="Toggle Side Panel"
-          >
-            {isSidePanelOpen ? <PanelLeftClose className="h-5 w-5" /> : <PanelLeftOpen className="h-5 w-5" />}
-          </Button>
-        </div>
+              <Card>
+                <CardHeader className="p-4 pb-2">
+                  <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                    <Info className="h-4 w-4" /> Layer Insights: {selectedState}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-0 space-y-4">
+                  {activeLayer === "landuse" && (
+                    <div className="space-y-3">
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Visualizing agricultural vs urban land usage in {selectedState}.
+                      </p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="p-2 rounded bg-green-500/10 border border-green-500/20">
+                          <div className="text-[10px] text-green-600 font-bold">AGRI</div>
+                          <div className="text-xs font-semibold">{Math.floor(Math.random() * 40) + 40}% Area</div>
+                        </div>
+                        <div className="p-2 rounded bg-orange-500/10 border border-orange-500/20">
+                          <div className="text-[10px] text-orange-600 font-bold">URBAN</div>
+                          <div className="text-xs font-semibold">{Math.floor(Math.random() * 30) + 10}% Area</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {activeLayer === "disputes" && (
+                    <div className="space-y-3">
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Displaying areas with high litigation density in {selectedState}.
+                      </p>
+                      <div className="p-3 rounded bg-red-500/10 border border-red-500/20">
+                        <div className="text-xs font-bold text-red-600 mb-1">High Risk Area</div>
+                        <div className="text-[10px] text-muted-foreground">Average resolution time: {Math.floor(Math.random() * 5) + 2} years</div>
+                      </div>
+                    </div>
+                  )}
+                  {activeLayer === "climate" && (
+                    <div className="space-y-3">
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Mapping flood vulnerability and soil erosion risks in {selectedState}.
+                      </p>
+                      <div className="p-3 rounded bg-blue-500/10 border border-blue-500/20">
+                        <div className="text-xs font-bold text-blue-600 mb-1">Vulnerability High</div>
+                        <div className="text-[10px] text-muted-foreground">Est. crop loss risk: {Math.floor(Math.random() * 20) + 5}% in 2026</div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
 
-        <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            className="bg-background/80 backdrop-blur-md h-10 w-10"
-            onClick={toggleFullscreen}
-            title="Toggle Fullscreen"
-          >
-            <Maximize className="h-5 w-5" />
-          </Button>
-          <Badge className="bg-background/80 backdrop-blur-md text-foreground border-border px-3 py-1">
-            Live Data: ISRO Bhuvan API
-          </Badge>
-          <Badge className="bg-primary/80 backdrop-blur-md text-white border-transparent px-3 py-1">
-            Projection: EPSG:4326
-          </Badge>
-        </div>
-      </main>
-    </div>
+              <div className="flex flex-col gap-2">
+                <Button variant="outline" className="w-full gap-2">
+                  <Download className="h-4 w-4" /> Export Layer (GeoJSON)
+                </Button>
+                <Button variant="outline" className="w-full gap-2">
+                  <Maximize className="h-4 w-4" /> Fullscreen Analysis
+                </Button>
+              </div>
+            </div>
+          </ScrollArea>
+        </aside>
+
+        {/* Map Area */}
+        <main className="flex-1 relative h-full w-full">
+          <MapComponent
+            activeLayer={activeLayer}
+            isSidePanelOpen={isSidePanelOpen}
+            center={stateData?.center || [28.6139, 77.2090]}
+            zoom={stateData?.zoom || 13}
+            zones={currentZones}
+          />
+
+          {/* Map Overlays */}
+          <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              className="bg-background/80 backdrop-blur-md h-10 w-10"
+              onClick={() => setIsSidePanelOpen(!isSidePanelOpen)}
+              title="Toggle Side Panel"
+            >
+              {isSidePanelOpen ? <PanelLeftClose className="h-5 w-5" /> : <PanelLeftOpen className="h-5 w-5" />}
+            </Button>
+          </div>
+
+          <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              className="bg-background/80 backdrop-blur-md h-10 w-10"
+              onClick={toggleFullscreen}
+              title="Toggle Fullscreen"
+            >
+              <Maximize className="h-5 w-5" />
+            </Button>
+            <Badge className="bg-background/80 backdrop-blur-md text-foreground border-border px-3 py-1">
+              Live Data: ISRO Bhuvan API
+            </Badge>
+            <Badge className="bg-primary/80 backdrop-blur-md text-white border-transparent px-3 py-1">
+              Projection: EPSG:4326
+            </Badge>
+          </div>
+        </main>
+      </div>
+    </ProtectedRoute>
   );
 }

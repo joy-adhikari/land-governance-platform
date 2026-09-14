@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Polygon, Tooltip, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L, { LatLngTuple } from "leaflet";
+import { LandZone } from "@/lib/gis-api";
 
 
 // Fix for default marker icons in Leaflet
@@ -25,6 +26,9 @@ L.Marker.prototype.options.icon = DefaultIcon;
 interface MapComponentProps {
   activeLayer: string;
   isSidePanelOpen?: boolean;
+  center: [number, number];
+  zoom: number;
+  zones: LandZone[];
 }
 
 function MapResizer({ isSidePanelOpen }: { isSidePanelOpen?: boolean }) {
@@ -41,11 +45,11 @@ const MOCK_ZONES = [
   { id: 3, name: "Conservation Zone C", color: "blue", coords: [[28.60, 77.23], [28.61, 77.23], [28.61, 77.24], [28.60, 77.24]] as LatLngTuple[], risk: "Medium" },
 ];
 
-export default function MapComponent({ activeLayer, isSidePanelOpen }: MapComponentProps) {
+export default function MapComponent({ activeLayer, isSidePanelOpen, center, zoom, zones }: MapComponentProps) {
   return (
     <MapContainer
-      center={[28.6139, 77.2090] as any}
-      zoom={13}
+      center={center}
+      zoom={zoom}
       className="h-full w-full z-0"
     >
       <MapResizer isSidePanelOpen={isSidePanelOpen} />
@@ -53,6 +57,7 @@ export default function MapComponent({ activeLayer, isSidePanelOpen }: MapCompon
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+
 
 
       {activeLayer === "landuse" && MOCK_ZONES.map(zone => (

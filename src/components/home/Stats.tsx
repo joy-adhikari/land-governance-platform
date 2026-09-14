@@ -13,7 +13,7 @@ const stats = [
 export default function Stats() {
   return (
     <section className="py-24 bg-primary text-primary-foreground">
-      <div className="container">
+      <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, i) => (
             <div key={i} className="flex flex-col items-center text-center gap-2 p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 transition-transform hover:scale-105">

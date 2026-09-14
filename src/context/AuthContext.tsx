@@ -15,7 +15,7 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, role: UserRole) => void;
+  login: (user: User) => void;
   logout: () => void;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -42,17 +42,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = (email: string, role: UserRole) => {
-
-    const mockUser: User = {
-      id: "user-" + Math.random().toString(36).substr(2, 9),
-      email,
-      full_name: role === "ADMIN" ? "System Administrator" : "Verified User",
-      role,
-      organization: role === "RESEARCHER" ? "IIT Bombay" : "DoLR",
-    };
-    setUser(mockUser);
-    localStorage.setItem("landgov_user", JSON.stringify(mockUser));
+  const login = (userData: User) => {
+    setUser(userData);
+    localStorage.setItem("landgov_user", JSON.stringify(userData));
     router.push("/");
   };
 

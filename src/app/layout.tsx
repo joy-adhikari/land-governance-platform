@@ -38,7 +38,7 @@ export default function RootLayout({
           <AuthProvider>
             <Navbar />
             <main className="flex-1">{children}</main>
-            <Footer />
+            {/* Footer removed to clean up GIS and other pages */}
             <AiAssistant />
           </AuthProvider>
         </ThemeProvider>

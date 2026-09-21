@@ -10,8 +10,7 @@ import {
   Download,
   AlertTriangle,
   PanelLeftClose,
-  PanelLeftOpen,
-  Map as MapIcon
+  PanelLeftOpen
 } from "lucide-react";
 import {
   Card,
@@ -55,7 +54,6 @@ const LAYERS = [
   { id: "landuse", name: "Land Use Patterns", icon: Layers, color: "text-green-500" },
   { id: "disputes", name: "Dispute Hotspots", icon: AlertTriangle, color: "text-red-500" },
   { id: "climate", name: "Climate Vulnerability", icon: Info, color: "text-blue-500" },
-  { id: "svamitva", name: "SVAMITVA Records", icon: MapIcon, color: "text-purple-500" },
 ];
 
 export default function GISPage() {
@@ -71,13 +69,7 @@ export default function GISPage() {
       setIsLoading(true);
       try {
         const res = await fetch(`/api/gis?state=${selectedState}`);
-
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-
-        const text = await res.text();
-        const data = JSON.parse(text.trim());
+        const data = await res.json();
         setStateData(data);
       } catch (err) {
         console.error("Failed to fetch GIS data", err);
@@ -91,7 +83,6 @@ export default function GISPage() {
   const currentZones = stateData?.zones || [];
 
   const toggleFullscreen = () => {
-
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(err => {
         console.error(`Error attempting to enable full-screen mode: ${err.message}`);
@@ -117,24 +108,7 @@ export default function GISPage() {
         )}>
           <div className="p-6 border-b min-w-[320px]">
             <h1 className="text-2xl font-bold tracking-tight">GIS Dashboard</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Geospatial analysis of land governance across India.
-            </p>
-
-            <div className="mt-4 space-y-2">
-              <label className="text-xs font-bold uppercase text-muted-foreground">Select State/UT</label>
-              <select
-                className="w-full p-2 rounded-md border bg-background text-sm focus:ring-2 focus:ring-primary outline-none"
-                value={selectedState}
-                onChange={(e) => setSelectedState(e.target.value)}
-              >
-                {getStates().map(state => (
-                  <option key={state} value={state}>{state}</option>
-                ))}
-              </select>
-            </div>
           </div>
-
           <ScrollArea className="flex-1 p-6 overflow-y-auto">
             <div className="space-y-8 min-w-[250px]">
               <div>
@@ -199,17 +173,6 @@ export default function GISPage() {
                       <div className="p-3 rounded bg-blue-500/10 border border-blue-500/20">
                         <div className="text-xs font-bold text-blue-600 mb-1">Vulnerability High</div>
                         <div className="text-[10px] text-muted-foreground">Est. crop loss risk: {Math.floor(Math.random() * 20) + 5}% in 2026</div>
-                      </div>
-                    </div>
-                  )}
-                  {activeLayer === "svamitva" && (
-                    <div className="space-y-3">
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        SVAMITVA Pilot: Drone-based property mapping and ownership records.
-                      </p>
-                      <div className="p-3 rounded bg-purple-500/10 border border-purple-500/20">
-                        <div className="text-xs font-bold text-purple-600 mb-1">Property Mapping Progress</div>
-                        <div className="text-[10px] text-muted-foreground">Mapped: {Math.floor(Math.random() * 40) + 60}% of rural settlements</div>
                       </div>
                     </div>
                   )}

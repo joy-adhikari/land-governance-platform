@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import { useRouter } from "next/navigation";
 import {
   Trophy,
   Lightbulb,
@@ -55,6 +55,8 @@ const CHALLENGES = [
 ];
 
 export default function InnovationPage() {
+  const router = useRouter();
+
   return (
     <ProtectedRoute>
       <div className="container mx-auto px-4 py-10 space-y-12">
@@ -79,7 +81,11 @@ export default function InnovationPage() {
               <p className="text-sm text-muted-foreground mt-1">Challenges across 5 states</p>
             </CardContent>
             <CardFooter>
-              <Button variant="default" className="w-full gap-2">
+              <Button
+                variant="default"
+                className="w-full gap-2"
+                onClick={() => router.push("/innovation#challenges")}
+              >
                 Browse Challenges <ArrowRight className="h-4 w-4" />
               </Button>
             </CardFooter>
@@ -98,7 +104,11 @@ export default function InnovationPage() {
               <p className="text-sm text-muted-foreground mt-1">Total funding available</p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full gap-2">
+              <Button
+                variant="outline"
+                className="w-full gap-2"
+                onClick={() => router.push("/repository")}
+              >
                 Apply for Grant <ArrowRight className="h-4 w-4" />
               </Button>
             </CardFooter>
@@ -117,17 +127,21 @@ export default function InnovationPage() {
               <p className="text-sm text-muted-foreground mt-1">Currently in field testing</p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full gap-2">
+              <Button
+                variant="outline"
+                className="w-full gap-2"
+                onClick={() => router.push("/gis")}
+              >
                 Explore Registry <ArrowRight className="h-4 w-4" />
               </Button>
             </CardFooter>
           </Card>
         </div>
 
-        <div className="space-y-6">
+        <div id="challenges" className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold tracking-tight">Active Challenges</h2>
-            <Button variant="ghost" className="text-primary">View All</Button>
+            <Button variant="ghost" className="text-primary" onClick={() => router.push("/repository")}>View All</Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -156,7 +170,10 @@ export default function InnovationPage() {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full gap-2">
+                  <Button
+                    className="w-full gap-2"
+                    onClick={() => router.push("/repository")}
+                  >
                     Submit Proposal <ArrowRight className="h-4 w-4" />
                   </Button>
                 </CardFooter>

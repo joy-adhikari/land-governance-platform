@@ -44,26 +44,35 @@ export default function SearchPage() {
 
     setIsSearching(true);
 
-    // Mocking an AI synthesis process (RAG)
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: query }),
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch AI response");
+
+      const data = await response.json();
+
       const relevantDocs = MOCK_DOCUMENTS.filter(doc =>
         doc.title.toLowerCase().includes(query.toLowerCase()) ||
         doc.abstract.toLowerCase().includes(query.toLowerCase())
       );
 
-      // Mock synthesis answer based on query
-      const mockAnswer = query.toLowerCase().includes("credit")
-        ? "Based on current research, the digitization of land records has significantly reduced the time taken for credit appraisal in rural areas, particularly in Maharashtra, by providing verified collateral data to banks."
-        : query.toLowerCase().includes("climate")
-        ? "Climate vulnerability mapping in coastal Odisha indicates a high risk of soil salinity increase, suggesting a need for a strategic retreat and shift towards salt-tolerant crop varieties."
-        : "Based on the indexed repository, land governance is transitioning toward a digital-first approach. Key trends include the implementation of SVAMITVA for rural property mapping and the integration of satellite imagery for land-use monitoring.";
-
       setResults({
-        answer: mockAnswer,
+        answer: data.response,
         sources: relevantDocs.length > 0 ? relevantDocs : MOCK_DOCUMENTS.slice(0, 2),
       });
+    } catch (error) {
+      console.error("Search error:", error);
+      setResults({
+        answer: "I'm sorry, I'm having trouble connecting to the AI service. Please try again in a moment.",
+        sources: MOCK_DOCUMENTS.slice(0, 2),
+      });
+    } finally {
       setIsSearching(false);
-    }, 1500);
+    }
   };
 
   return (

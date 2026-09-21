@@ -1,0 +1,55 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "Delhi", "color": "green", "risk": "Low" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [77.0, 28.4], [77.3, 28.4], [77.3, 28.8], [77.0, 28.8], [77.0, 28.4]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Maharashtra", "color": "blue", "risk": "Medium" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [72.5, 15.0], [80.0, 15.0], [80.0, 20.0], [72.5, 20.0], [72.5, 15.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Tamil Nadu", "color": "orange", "risk": "High" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [77.0, 8.0], [80.5, 8.0], [80.5, 13.5], [77.0, 13.5], [77.0, 8.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Uttar Pradesh", "color": "purple", "risk": "Medium" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [77.0, 23.0], [84.0, 23.0], [84.0, 30.0], [77.0, 30.0], [77.0, 23.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Assam", "color": "red", "risk": "High" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [91.0, 24.0], [96.0, 24.0], [96.0, 28.0], [91.0, 28.0], [91.0, 24.0]
+        ]]
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "Delhi", "color": "green", "risk": "Low" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [77.0, 28.5], [77.3, 28.5], [77.3, 28.8], [77.0, 28.8], [77.0, 28.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Maharashtra", "color": "blue", "risk": "Medium" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [72.5, 15.0], [80.0, 15.0], [80.0, 20.0], [72.5, 20.0], [72.5, 15.0]
+        ]]
+      }
+    }
+  ]
+}

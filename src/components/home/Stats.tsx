@@ -16,13 +16,13 @@ export default function Stats() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, i) => (
-            <div key={i} className="flex flex-col items-center text-center gap-2 p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 transition-transform hover:scale-105">
-              <div className="bg-white/20 p-3 rounded-full mb-2">
-                <stat.icon className="h-6 w-6 text-white" />
+            <div key={i} className="flex flex-col items-center text-center gap-2 p-6 rounded-2xl bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20 transition-transform hover:scale-105">
+              <div className="bg-primary-foreground/20 p-3 rounded-full mb-2">
+                <stat.icon className="h-6 w-6 text-primary-foreground" />
               </div>
-              <div className="text-4xl font-bold tracking-tight">{stat.value}</div>
-              <div className="text-sm font-medium opacity-80">{stat.label}</div>
-              <div className="text-[10px] opacity-60 font-mono mt-2">{stat.trend}</div>
+              <div className="text-4xl font-bold tracking-tight text-primary-foreground">{stat.value}</div>
+              <div className="text-sm font-medium opacity-90 text-primary-foreground">{stat.label}</div>
+              <div className="text-[10px] opacity-70 font-mono mt-2 text-primary-foreground">{stat.trend}</div>
             </div>
           ))}
         </div>

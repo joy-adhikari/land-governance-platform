@@ -12,6 +12,22 @@ import {
   AlertTriangle
 } from "lucide-react";
 import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  AreaChart,
+  Area
+} from "recharts";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -39,6 +55,14 @@ import {
 } from "@/components/ui/tabs";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
+function cn(...inputs: any[]) {
+  return inputs.filter(Boolean).join(" ");
+}
+
+function Users(props: any) {
+  return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+}
+
 export default function SimulationPage() {
   const [params, setParams] = useState({
     taxRate: 5,
@@ -59,9 +83,7 @@ export default function SimulationPage() {
 
   const runSimulation = () => {
     setIsSimulating(true);
-    // Mock simulation delay
     setTimeout(() => {
-      // Simple mock logic to derive results from parameters
       const revenue = (params.taxRate * 10) + (params.digitizationRate * 2);
       const disputeRisk = 100 - (params.digitizationRate * 0.8) - (params.subsidyLevel * 0.5);
       const farmerSatisfaction = params.subsidyLevel + (100 - params.taxRate * 2);
@@ -233,6 +255,173 @@ export default function SimulationPage() {
                   </Card>
                 </div>
 
+                <Tabs defaultValue="bar" className="w-full">
+                  <TabsList className="grid w-full grid-cols-4 mb-8">
+                    <TabsTrigger value="bar">Comparison</TabsTrigger>
+                    <TabsTrigger value="pie">Distribution</TabsTrigger>
+                    <TabsTrigger value="line">Projection</TabsTrigger>
+                    <TabsTrigger value="area">Velocity</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="bar">
+                    <Card className="border-none shadow-sm bg-background">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg font-semibold">KPI Comparison</CardTitle>
+                        <CardDescription>Direct contrast of simulation outcomes</CardDescription>
+                      </CardHeader>
+                      <CardContent className="p-0">
+                        <div style={{ width: '100%', height: '400px' }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                              data={[
+                                { name: 'Revenue', value: results.revenue, color: '#3b82f6' },
+                                { name: 'Risk', value: results.disputeRisk, color: '#ef4444' },
+                                { name: 'Satisfaction', value: results.farmerSatisfaction, color: '#10b981' },
+                                { name: 'Growth', value: results.economicGrowth, color: '#f59e0b' },
+                              ]}
+                              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                            >
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                              <XAxis
+                                dataKey="name"
+                                axisLine={false}
+                                tickLine={false}
+                                tick={{ fill: '#64748b', fontSize: 12 }}
+                              />
+                              <YAxis
+                                axisLine={false}
+                                tickLine={false}
+                                tick={{ fill: '#64748b', fontSize: 12 }}
+                              />
+                              <RechartsTooltip
+                                cursor={{ fill: '#f1f5f9' }}
+                                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                              />
+                              <Bar dataKey="value" radius={[6, 6, 0, 0]} barSize={60}>
+                                { [0,1,2,3].map((_, index) => (
+                                  <Cell key={`cell-${index}`} fill={['#3b82f6', '#ef4444', '#10b981', '#f59e0b'][index]} />
+                                ))}
+                              </Bar>
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="pie">
+                    <Card className="border-none shadow-sm bg-background">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg font-semibold">Outcome Weight</CardTitle>
+                        <CardDescription>Relative distribution of simulated metrics</CardDescription>
+                      </CardHeader>
+                      <CardContent className="p-0">
+                        <div style={{ width: '100%', height: '400px' }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                              <Pie
+                                data={[
+                                  { name: 'Revenue', value: results.revenue },
+                                  { name: 'Risk', value: results.disputeRisk },
+                                  { name: 'Satisfaction', value: results.farmerSatisfaction },
+                                  { name: 'Growth', value: results.economicGrowth },
+                                ]}
+                                cx="50%" cy="50%" innerRadius={80} outerRadius={110} paddingAngle={8} dataKey="value"
+                                stroke="none"
+                              >
+                                <Cell fill="#3b82f6" />
+                                <Cell fill="#ef4444" />
+                                <Cell fill="#10b981" />
+                                <Cell fill="#f59e0b" />
+                              </Pie>
+                              <RechartsTooltip
+                                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                              />
+                            </PieChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="line">
+                    <Card className="border-none shadow-sm bg-background">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg font-semibold">Policy Trajectory</CardTitle>
+                        <CardDescription>Projected trend from baseline to target</CardDescription>
+                      </CardHeader>
+                      <CardContent className="p-0">
+                        <div style={{ width: '100%', height: '400px' }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={[
+                              { name: 'Baseline', rev: results.revenue * 0.6, risk: results.disputeRisk * 1.3 },
+                              { name: 'Phase 1', rev: results.revenue * 0.8, risk: results.disputeRisk * 1.1 },
+                              { name: 'Phase 2', rev: results.revenue * 0.9, risk: results.disputeRisk * 1.05 },
+                              { name: 'Target', rev: results.revenue, risk: results.disputeRisk },
+                            ]} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                              <XAxis
+                                dataKey="name"
+                                axisLine={false}
+                                tickLine={false}
+                                tick={{ fill: '#64748b', fontSize: 12 }}
+                              />
+                              <YAxis
+                                axisLine={false}
+                                tickLine={false}
+                                tick={{ fill: '#64748b', fontSize: 12 }}
+                              />
+                              <RechartsTooltip
+                                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                              />
+                              <Line type="monotone" dataKey="rev" name="Revenue" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, fill: '#3b82f6' }} activeDot={{ r: 6 }} />
+                              <Line type="monotone" dataKey="risk" name="Risk Index" stroke="#ef4444" strokeWidth={3} dot={{ r: 4, fill: '#ef4444' }} activeDot={{ r: 6 }} />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="area">
+                    <Card className="border-none shadow-sm bg-background">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg font-semibold">Growth Velocity</CardTitle>
+                        <CardDescription>Projected acceleration of local GDP</CardDescription>
+                      </CardHeader>
+                      <CardContent className="p-0">
+                        <div style={{ width: '100%', height: '400px' }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={[
+                              { name: 'Q1', value: results.economicGrowth * 0.4 },
+                              { name: 'Q2', value: results.economicGrowth * 0.65 },
+                              { name: 'Q3', value: results.economicGrowth * 0.85 },
+                              { name: 'Q4', value: results.economicGrowth },
+                            ]} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                              <XAxis
+                                dataKey="name"
+                                axisLine={false}
+                                tickLine={false}
+                                tick={{ fill: '#64748b', fontSize: 12 }}
+                              />
+                              <YAxis
+                                axisLine={false}
+                                tickLine={false}
+                                tick={{ fill: '#64748b', fontSize: 12 }}
+                              />
+                              <RechartsTooltip
+                                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                              />
+                              <Area type="monotone" dataKey="value" name="GDP Growth" stroke="#10b981" fill="#10b981" fillOpacity={0.2} strokeWidth={3} />
+                            </AreaChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
+
                 <Card className="bg-muted/50">
                   <CardHeader>
                     <CardTitle className="text-lg">Policy Verdict</CardTitle>
@@ -288,12 +477,4 @@ export default function SimulationPage() {
       </div>
     </ProtectedRoute>
   );
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(" ");
-}
-
-function Users(props: any) {
-  return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Polygon, Tooltip, useMap } from "react-leaflet";
+import React, { useEffect, useState } from "react";
+import { MapContainer, TileLayer, Marker, Popup, Polygon, Tooltip, useMap, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L, { LatLngTuple } from "leaflet";
 import { LandZone } from "@/lib/gis-api";
@@ -11,17 +11,30 @@ import { LandZone } from "@/lib/gis-api";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
-// Casting the image imports to any or using .src to avoid StaticImageData error
 const iconUrl = (markerIcon as any).src || markerIcon;
 const shadowUrl = (markerShadow as any).src || markerShadow;
 
-let DefaultIcon = L.icon({
+const createColoredIcon = (color: string) => L.icon({
+  iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
+  shadowUrl: shadowUrl,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
+
+const ICONS = {
+  red: createColoredIcon('red'),
+  blue: createColoredIcon('blue'),
+  green: createColoredIcon('green'),
+  violet: createColoredIcon('violet'),
+  orange: createColoredIcon('orange'),
+};
+
+L.Marker.prototype.options.icon = L.icon({
   iconUrl: iconUrl,
   shadowUrl: shadowUrl,
   iconSize: [25, 41],
   iconAnchor: [12, 41],
 });
-L.Marker.prototype.options.icon = DefaultIcon;
 
 interface MapComponentProps {
   activeLayer: string;
@@ -39,13 +52,38 @@ function MapResizer({ isSidePanelOpen }: { isSidePanelOpen?: boolean }) {
   return null;
 }
 
-const MOCK_ZONES = [
-  { id: 1, name: "Agricultural Zone A", color: "green", coords: [[28.61, 77.20], [28.62, 77.20], [28.62, 77.21], [28.61, 77.21]] as LatLngTuple[], risk: "Low" },
-  { id: 2, name: "Urban Expansion Zone B", color: "orange", coords: [[28.63, 77.22], [28.64, 77.22], [28.64, 77.23], [28.63, 77.23]] as LatLngTuple[], risk: "High" },
-  { id: 3, name: "Conservation Zone C", color: "blue", coords: [[28.60, 77.23], [28.61, 77.23], [28.61, 77.24], [28.60, 77.24]] as LatLngTuple[], risk: "Medium" },
-];
+export default function MapComponent({ activeLayer, isSidePanelOpen, center, zoom, zones = [] }: MapComponentProps) {
+  const [isMounted, setIsMounted] = useState(false);
+  const [geoData, setGeoData] = useState<any>(null);
 
-export default function MapComponent({ activeLayer, isSidePanelOpen, center, zoom, zones }: MapComponentProps) {
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    async function loadGeoJson() {
+      try {
+        // Fetching from local API instead of volatile external URL
+        const response = await fetch("/api/gis?geojson=true");
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const text = await response.text();
+        const data = JSON.parse(text.trim());
+        setGeoData(data);
+      } catch (err) {
+        console.error("Failed to load local GeoJSON", err);
+      }
+    }
+    loadGeoJson();
+  }, []);
+
+  if (!isMounted) {
+    return <div className="h-full w-full bg-muted animate-pulse" />;
+  }
+
   return (
     <MapContainer
       center={center}
@@ -58,30 +96,50 @@ export default function MapComponent({ activeLayer, isSidePanelOpen, center, zoo
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
+      {activeLayer === "landuse" && geoData && (
+        <GeoJSON
+          data={geoData}
+          style={(feature: any) => {
+            const stateName = feature?.properties?.ST_NM || feature?.properties?.state_name;
+            const stateInfo = zones.find((z: any) => z.name === stateName);
 
+            return {
+              color: stateInfo?.color || "#2ecc71",
+              fillColor: stateInfo?.color || "#2ecc71",
+              fillOpacity: 0.4,
+              weight: 1,
+            };
+          }}
+          onEachFeature={(feature: any, layer: any) => {
+            const stateName = feature?.properties?.ST_NM || feature?.properties?.state_name;
+            const stateInfo = zones.find((z: any) => z.name === stateName);
+            layer.bindTooltip(`<strong>${stateName || 'Unknown'}</strong><br/>Risk: ${stateInfo?.risk || 'N/A'}`);
+          }}
+        />
+      )}
 
-      {activeLayer === "landuse" && MOCK_ZONES.map(zone => (
-        <Polygon
-          key={zone.id}
-          positions={zone.coords}
-          pathOptions={{ color: zone.color, fillOpacity: 0.5 }}
-        >
-          <Tooltip>
-            <strong>{zone.name}</strong><br/>Risk: {zone.risk}
-          </Tooltip>
-        </Polygon>
+      {activeLayer === "disputes" && zones?.map(zone => (
+        zone.risk === "High" && (
+          <Marker key={`dispute-${zone.id}`} position={zone.coords?.[0] as any}>
+            <Popup>High dispute concentration area: {zone.name}</Popup>
+          </Marker>
+        )
       ))}
 
-      {activeLayer === "disputes" && (
-        <>
-          <Marker position={[28.61, 77.21] as any}>
-            <Popup>High dispute concentration area (Case #402)</Popup>
+      {activeLayer === "climate" && zones?.map(zone => (
+        (zone.risk === "Medium" || zone.risk === "High") && (
+          <Marker key={`climate-${zone.id}`} position={zone.coords?.[0] as any}>
+            <Popup>Climate Vulnerability: {zone.name} ({zone.risk} Risk)</Popup>
           </Marker>
-          <Marker position={[28.63, 77.23] as any}>
-            <Popup>Pending adjudication (Case #119)</Popup>
+        )
+      ))}
+      {activeLayer === "svamitva" && zones?.map(zone => (
+        zone.risk === "Low" && (
+          <Marker key={`svamitva-${zone.id}`} position={zone.coords?.[0] as any}>
+            <Popup>SVAMITVA Property Record: {zone.name} (Verified)</Popup>
           </Marker>
-        </>
-      )}
+        )
+      ))}
     </MapContainer>
   );
 }

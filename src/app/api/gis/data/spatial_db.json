@@ -1,0 +1,81 @@
+{
+  "states": {
+    "Delhi": {
+      "center": [28.6139, 77.2090],
+      "zoom": 12,
+      "layers": {
+        "landuse": [
+          { "id": 1, "name": "Agricultural Zone A", "color": "green", "coords": [[28.61, 77.20], [28.62, 77.20], [28.62, 77.21], [28.61, 77.21]], "risk": "Low" },
+          { "id": 2, "name": "Urban Expansion Zone B", "color": "orange", "coords": [[28.63, 77.22], [28.64, 77.22], [28.64, 77.23], [28.63, 77.23]], "risk": "High" }
+        ],
+        "disputes": [
+          { "id": 101, "location": [28.615, 77.205], "case": "Case #402", "severity": "High" }
+        ],
+        "climate": [
+          { "id": 201, "location": [28.60, 77.23], "risk": "Medium", "type": "Flood" }
+        ]
+      }
+    },
+    "Maharashtra": {
+      "center": [19.0760, 72.8777],
+      "zoom": 8,
+      "layers": {
+        "landuse": [
+          { "id": 3, "name": "Konkan Coastline", "color": "blue", "coords": [[18.9, 72.8], [19.0, 72.8], [19.0, 72.9], [18.9, 72.9]], "risk": "Medium" },
+          { "id": 4, "name": "Western Ghats Forest", "color": "green", "coords": [[19.1, 73.0], [19.2, 73.0], [19.2, 73.1], [19.1, 73.1]], "risk": "Low" }
+        ],
+        "disputes": [
+          { "id": 102, "location": [19.1, 73.05], "case": "Case #882", "severity": "High" }
+        ],
+        "climate": [
+          { "id": 202, "location": [18.95, 72.85], "risk": "High", "type": "Coastal Erosion" }
+        ]
+      }
+    },
+    "Tamil Nadu": {
+      "center": [13.0827, 80.2707],
+      "zoom": 8,
+      "layers": {
+        "landuse": [
+          { "id": 5, "name": "Cauvery Delta", "color": "green", "coords": [[11.0, 79.5], [11.1, 79.5], [11.1, 79.6], [11.0, 79.6]], "risk": "Low" }
+        ],
+        "disputes": [
+          { "id": 103, "location": [11.05, 79.55], "case": "Case #211", "severity": "Medium" }
+        ],
+        "climate": [
+          { "id": 203, "location": [13.0, 80.2], "risk": "High", "type": "Cyclonic Risk" }
+        ]
+      }
+    },
+    "Uttar Pradesh": {
+      "center": [26.8467, 80.9462],
+      "zoom": 7,
+      "layers": {
+        "landuse": [
+          { "id": 6, "name": "Gangetic Plains", "color": "green", "coords": [[26.0, 80.0], [26.1, 80.0], [26.1, 80.1], [26.0, 80.1]], "risk": "Low" }
+        ],
+        "disputes": [
+          { "id": 104, "location": [26.5, 80.5], "case": "Case #901", "severity": "High" }
+        ],
+        "climate": [
+          { "id": 204, "location": [27.1, 81.1], "risk": "High", "type": "Riverine Flood" }
+        ]
+      }
+    },
+    "Assam": {
+      "center": [26.2006, 92.9376],
+      "zoom": 8,
+      "layers": {
+        "landuse": [
+          { "id": 7, "name": "Brahmaputra Basin", "color": "blue", "coords": [[26.1, 92.0], [26.2, 92.0], [26.2, 92.1], [26.1, 92.1]], "risk": "Medium" }
+        ],
+        "disputes": [
+          { "id": 105, "location": [26.25, 92.1], "case": "Case #331", "severity": "Medium" }
+        ],
+        "climate": [
+          { "id": 205, "location": [26.15, 92.05], "risk": "High", "type": "Soil Erosion" }
+        ]
+      }
+    }
+  }
+}

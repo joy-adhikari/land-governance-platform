@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
 const PlantPath = ({ side }: { side: "left" | "right" }) => {
@@ -27,11 +27,10 @@ const PlantPath = ({ side }: { side: "left" | "right" }) => {
       <svg
         viewBox="0 0 100 1000"
         preserveAspectRatio="none"
-        className="h-full w-full"
+        className="h-full w-full text-primary/30"
         fill="none"
         stroke="currentColor"
         strokeWidth="3"
-        className="text-primary/30"
       >
         <motion.path
           d="M 20 1000 C 20 800, 60 700, 20 500 C -20 300, 60 200, 20 0"
